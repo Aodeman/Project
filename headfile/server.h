@@ -24,7 +24,7 @@ int sock_server_init(char *listen_ip,int port)
 		return -1;
 	}
 
-        if((setsockopt(serfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)))<0)
+    if((setsockopt(serfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)))<0)
 	{
 	        perror("Setsockpt failure");
 	}

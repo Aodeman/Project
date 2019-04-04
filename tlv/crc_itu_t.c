@@ -4,8 +4,8 @@
  * This source code is licensed under the GNU General Public License,
  * Version 2. See the file COPYING for more details.
  */
-
-#include "crc-itu-t.h"
+#include <stdio.h>
+#include "crc_itu_t.h"
 
 /** CRC table for the CRC ITU-T V.41 0x0x1021 (x^16 + x^12 + x^15 + 1) */
 const unsigned short crc_itu_t_table[256] = {
@@ -94,3 +94,22 @@ unsigned short bytes_to_ushort(unsigned char *bytes, int len)
 	return val;
 }
 
+int main()
+{
+
+    char    buf[10];
+
+    buf[0]=0xfd;
+    buf[1]=0x01;
+    buf[2]=0xdd;
+    unsigned int len=3;
+    unsigned short crc=0;
+
+    crc = crc_itu_t(IoT_MAGIC_CRC, buf, len);
+    printf("%x\n",crc);
+    ushort_to_bytes(&buf[3], crc);
+    printf("%x\n",crc);
+    crc=crc_itu_t(IoT_MAGIC_CRC,buf,len+2);
+    printf("%x\n",crc);
+    
+}

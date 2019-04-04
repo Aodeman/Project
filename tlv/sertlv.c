@@ -1,18 +1,30 @@
-#include "server.h"
 #include <stdlib.h>
 #include <string.h>
+#include "crc_itu_t.h"
+#include "server.h"
 
+
+#define MIN_DATASIZE 6
 #define MAX_ARRAY 1024
+typedef enum {
+
+        TEMP=1,
+        TIME,
+        ID
+} type;
 
 
 int main()
 {
+    int                     i;
+    int                     num=0;
     int                     newfd=-1;
     int                     sockfd=-1;
+    int                     buf_size;
     struct sockaddr_in      cliaddr;
     socklen_t               len;
     char                    buf[MAX_ARRAY];
-  
+    unsigned short          crc16; 
    
 
 
@@ -39,18 +51,67 @@ int main()
             if(rv<0)
       	    {
                 perror("read");
-	        return -1;
+    	        return -1;
             }
-	    if(rv==0)
+            if(rv==0)
             {
-	        return 0;
-	    }
+	            return 0;
+            }
 
-	    printf("%x\n",buf[0]);
-	    printf("%x\n",buf[1]);
-	    printf("%d\n",buf[2]);
-	    printf("%s\n",buf+3);
+Start:
+            num++;
 
+            if(strlen(buf)<MIN_DATASIZE)
+            {   
+                printf("num %d \n  errir:incomplete data\n",num);
+                
+                continue;
+            }
+            for(i=0;i<strlen(buf);i++)
+            {
+                if(buf[i]==0xfd)
+                { 
+                    memmove(buf,buf+i,strlen(buf+i));
+                    break; 
+                }
+
+
+            }
+            if(strlen(buf)<6 || i==strlen(buf))
+            {   
+                printf("num %d \n  errir:incomplete data\n",num);
+                continue;
+            }
+
+            if(buf[1]!=ID && buf[1]!=TIME && buf[1] !=TEMP)
+            {
+                printf("tag error\n");
+                memmove(buf,buf+1,strlen(buf+1));
+                goto Start;
+            }
+            if(buf[2] < MIN_DATASIZE)
+            {
+                printf("lenth errir:lenth %dB   recive %dB \n",buf[2],strlen(buf));
+                memmove(buf,buf+2,strlen(buf+2));
+                goto Start;                
+            }
+
+
+            crc16=crc_itu_t(IoT_MAGIC_CRC,buf,buf[2]);
+            if(crc16!=0)
+            {
+                printf("value error\n");
+                memmove(buf,buf+2,strlen(buf+2));
+                goto Start;
+            }
+            printf("Correct data:");
+            for(int q=0;q<buf[2];q++)
+            {
+                printf(" %x",buf[q]);
+            }
+            printf("\n");
+            memmove(buf,buf+buf[2],strlen(buf+buf[2]));
+            goto Start;
         }
     }
   

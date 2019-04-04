@@ -23,9 +23,9 @@ int socket_client_init (int port , char  *serip)
 	printf("Socket success!\n");
 	
 		
-        seraddr.sin_family=AF_INET;
-        seraddr.sin_port=htons(port);
-        inet_aton(serip,&seraddr.sin_addr);
+    seraddr.sin_family=AF_INET;
+    seraddr.sin_port=htons(port);
+    inet_aton(serip,&seraddr.sin_addr);
 	
 
 	rv=connect(sockfd,(struct sockaddr *)&seraddr,sizeof(seraddr));
@@ -34,6 +34,7 @@ int socket_client_init (int port , char  *serip)
 		perror("Connect failure");
 		return -2;
 	}
+    printf("Connect \n");
 
         return sockfd;
 

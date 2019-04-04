@@ -13,7 +13,6 @@
 #include "crc_itu_t.h"
 #include <stdio.h>
 
-
 int main()
 {
 
@@ -25,7 +24,8 @@ int main()
     unsigned short a;
     unsigned short crc16;
 
-    crc16=crc_itu_i(a,buf,3);
+    crc16=crc_itu_t(IoT_MAGIC_CRC,buf,3);
+    ushort_to_bytes(&buf[3],crc16);
     printf("%x\n",crc16);
 
     return 0;

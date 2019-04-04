@@ -42,7 +42,8 @@ char * get_tem (void)
 		continue;
 
     }
-    s=buf;
+    buf[strlen(buf)-1]=0;
+    memcpy(s,buf,strlen(buf));
     closedir(dir);
     return s;
 
